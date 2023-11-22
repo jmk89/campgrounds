@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net.NetworkInformation;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,7 +16,7 @@ public class CollisionHandler : MonoBehaviour
 
     bool isTransitioning = false;
     int gateToRemove = 0;
-    bool collisionsEnabled = true;
+    public bool collisionsEnabled = true;
 
     void Start() {
         audioSource = GetComponent<AudioSource>();
@@ -25,7 +24,6 @@ public class CollisionHandler : MonoBehaviour
 
     void Update()
     {
-        ProcessCheatCodes();
         ProcessGateRemoval();
     }
 
@@ -55,6 +53,10 @@ public class CollisionHandler : MonoBehaviour
         }    
     }
 
+    public void toggleCollisionsEnabled() {
+        collisionsEnabled = !collisionsEnabled;
+    }
+
     void RemoveGate(int gateNumber) {
         GameObject gate = GameObject.FindGameObjectsWithTag("Gate" + gateNumber)[0];
         ParticleSystem[] particles = gate.GetComponentsInChildren<ParticleSystem>();
@@ -63,7 +65,6 @@ public class CollisionHandler : MonoBehaviour
         }
         gateToRemove = gateNumber;
         List<Collider> colliders = gate.GetComponentsInChildren<Collider>().ToList<Collider>();
-        // List<CapsuleCollider> capsuleColliders = gate.GetComponentsInChildren<CapsuleCollider>().ToList<CapsuleCollider>();
         foreach (Collider c in colliders) {
             c.enabled = false;
         }
@@ -88,41 +89,16 @@ public class CollisionHandler : MonoBehaviour
         }
     }
 
-    private void ProcessCheatCodes() {
-        if (Input.GetKey(KeyCode.L)) {
-            int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-            int numberScenes = SceneManager.sceneCountInBuildSettings;
-            currentSceneIndex++;
-            if (currentSceneIndex >= numberScenes) {
-                currentSceneIndex = 0;
-            }
-            SceneManager.LoadScene(currentSceneIndex);
-        }
-
-        if (Input.GetKeyDown(KeyCode.C)) {
-            collisionsEnabled = !collisionsEnabled;
-        }
-
-        if (Input.GetKeyDown(KeyCode.P)) {
-            GameObject[] leaves = GameObject.FindGameObjectsWithTag("Leaf");
-            foreach (GameObject leaf in leaves) {
-                Debug.Log("Destroying leaf");
-                Destroy(leaf);
-            }
-        }
-    }
-
     void cleanUpLeaves() {
         GameObject[] leaves = GameObject.FindGameObjectsWithTag("Leaf");
         foreach (GameObject leaf in leaves) {
-            Debug.Log("Destroying leaf");
             Destroy(leaf);
         }
     }
 
     void StartCrashSequence() {
         audioSource.Stop();
-        GetComponent<Movement>().enabled = false;
+        GetComponent<MovementRocket>().enabled = false;
         audioSource.PlayOneShot(crash);
         crashParticles.Play();
         Invoke("ReloadLevel", loadDelay);
@@ -137,7 +113,7 @@ public class CollisionHandler : MonoBehaviour
 
     void StartLoadNextScene() {
         audioSource.Stop();
-        GetComponent<Movement>().enabled = false;
+        GetComponent<MovementRocket>().enabled = false;
         audioSource.PlayOneShot(success);
         successParticles.Play();
         Invoke("LoadNextLevel", loadDelay);

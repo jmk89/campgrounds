@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Movement : MonoBehaviour
+public class MovementRocket : MonoBehaviour
 {
     [SerializeField] float rotationSpeed = 1f;
     [SerializeField] float fartForce = 1f;
