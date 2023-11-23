@@ -2875,9 +2875,10 @@ GameObject:
   m_Component:
   - component: {fileID: 935177439}
   - component: {fileID: 935177438}
+  - component: {fileID: 935177440}
   m_Layer: 0
   m_Name: CM vcam1
-  m_TagString: Untagged
+  m_TagString: FollowCam
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2901,7 +2902,7 @@ MonoBehaviour:
   m_Priority: 10
   m_StandbyUpdate: 2
   m_LookAt: {fileID: 0}
-  m_Follow: {fileID: 1248859414631108269}
+  m_Follow: {fileID: 0}
   m_Lens:
     FieldOfView: 40
     OrthographicSize: 5
@@ -2932,6 +2933,18 @@ Transform:
   m_Father: {fileID: 665154261}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 14.345, y: 0, z: 0}
+--- !u!114 &935177440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 935177437}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5eb4153611811af4d94071738402fd9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &936510780
 GameObject:
   m_ObjectHideFlags: 0
@@ -6523,14 +6536,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3990478690187575722, guid: 10210d847df3c6349842de566462cc42, type: 3}
-      propertyPath: inspectorCharacters.Array.data[0]
-      value: 
-      objectReference: {fileID: 9057081882020742188, guid: 96d8bff8087b0e44ab44990778879481, type: 3}
-    - target: {fileID: 3990478690187575722, guid: 10210d847df3c6349842de566462cc42, type: 3}
-      propertyPath: inspectorCharacters.Array.data[1]
-      value: 
-      objectReference: {fileID: 9057081882020742188, guid: bf577567b4135fc438cd3ac6e1d4d53a, type: 3}
     - target: {fileID: 3990478690187575732, guid: 10210d847df3c6349842de566462cc42, type: 3}
       propertyPath: m_Name
       value: PlayerSelector

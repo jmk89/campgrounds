@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerSelector : MonoBehaviour
 {
@@ -43,9 +44,17 @@ public class PlayerSelector : MonoBehaviour
     [SerializeField] GameObject[] inspectorCharacters;
     
     private List<Character> characters = new List<Character>();
+    private static GameObject instance;
+    private static int selectedCharacterIndex = 0;
 
     void Awake() {
-        DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(this);
+		
+	    if (instance == null) {
+		    instance = gameObject;
+	    } else {
+		    Destroy(gameObject);
+	    }
     }
 
     // Start is called before the first frame update
@@ -56,8 +65,15 @@ public class PlayerSelector : MonoBehaviour
         }
         characters.ElementAt(0).SetUnlocked(true);
         characters.ElementAt(0).SetSelected(true);
- 
-        SelectInitialCharacter(0);
+        SpawnCharacterAtLaunchPad(0);
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene arg0, LoadSceneMode arg1) {
+        GameObject character = GameObject.FindGameObjectWithTag("Player");
+        if (!character) {
+            SpawnCharacterAtLaunchPad(selectedCharacterIndex);
+        }
     }
 
     // Update is called once per frame
@@ -71,9 +87,9 @@ public class PlayerSelector : MonoBehaviour
     }
 
     void ProcessCharacterSelection() {
-        if (Input.GetKey(KeyCode.Alpha1)) {
+        if (Input.GetKeyDown(KeyCode.Alpha1)) {
             SelectCharacter(0);
-        } else if (Input.GetKey(KeyCode.Alpha2)){
+        } else if (Input.GetKeyDown(KeyCode.Alpha2)){
             SelectCharacter(1);
         }
     }
@@ -82,49 +98,44 @@ public class PlayerSelector : MonoBehaviour
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         CollisionHandler collisionHandler = player?.GetComponent<CollisionHandler>();
         if (!collisionHandler || collisionHandler.collidedWith != "Friendly") {
-            Debug.Log("return collision");
             return;
         }
         if (characters.Count <= (characterNumber - 1)) {
-            Debug.Log("return character count");
             return;
         }
         if (!characters.ElementAt(characterNumber).IsUnlocked()) {
-            Debug.Log("return not unlocked");
             return;
         }
 
-        Vector3 v = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
         Destroy(player);
-
         Character character = characters.ElementAt(characterNumber);
         character.SetSelected(true);
-        Instantiate(character.GetObject(), v, Quaternion.identity);
+        selectedCharacterIndex = characterNumber;
         characters.ForEach(c => {
             if (c != characters.ElementAt(characterNumber)) {
                 c.SetSelected(false);
             }
         });
+
+        SpawnCharacterAtLaunchPad(characterNumber);
     }
 
-    void SelectInitialCharacter(int characterNumber) {
+    void SpawnCharacterAtLaunchPad(int characterNumber) {
+        
         Character character = characters.ElementAt(characterNumber);
-        character.SetSelected(true);
-        character.SetUnlocked(true);
-        character.GetObject().tag = "Player";
-
         GameObject launchPad = GameObject.FindGameObjectWithTag("Friendly");
         Vector3 launchPadPosition = launchPad.transform.position;
-
         Vector3 spawnPosition = new Vector3(launchPadPosition.x, -500, 0);
         GameObject spawned = Instantiate(character.GetObject(), spawnPosition, Quaternion.identity);
 
         float spawnedHeight = spawned.GetComponent<BoxCollider>().bounds.size.y;
         float topOfLaunchPad = launchPadPosition.y + (launchPad.GetComponent<BoxCollider>().bounds.size.y / 2) ;
         float ySpawnPosition = topOfLaunchPad + (spawnedHeight / 2);
+        
         spawned.transform.position = new Vector3(spawnPosition.x, ySpawnPosition, 0);
-
+        spawned.tag = "Player";
         spawned.SetActive(true);
+        GameObject.FindGameObjectWithTag("FollowCam")?.GetComponent<UpdateCamera>()?.updateFollowTarget(spawned);
     }
 }
 

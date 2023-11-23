@@ -44,5 +44,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inspectorCharacters:
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 9057081882020742188, guid: 96d8bff8087b0e44ab44990778879481, type: 3}
+  - {fileID: 9057081882020742188, guid: bf577567b4135fc438cd3ac6e1d4d53a, type: 3}
