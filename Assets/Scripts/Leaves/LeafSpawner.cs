@@ -31,7 +31,7 @@ public class LeafSpawner : MonoBehaviour
         nextSpawnTime += spawnTime + timeModifier;
         Vector3 positionVariance = getRandomVector();
         Vector3 spawnPosition = new Vector3(transform.position.x + positionVariance.x, transform.position.y + positionVariance.y, + 0);
-        Instantiate(leaf, spawnPosition, transform.rotation);
+        Instantiate(leaf, spawnPosition, transform.rotation, this.gameObject.transform);
     }
 
     Vector3 getRandomVector() {

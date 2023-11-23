@@ -17,6 +17,7 @@ public class CollisionHandler : MonoBehaviour
     bool isTransitioning = false;
     int gateToRemove = 0;
     public bool collisionsEnabled = true;
+    public string collidedWith = "";
 
     void Start() {
         audioSource = GetComponent<AudioSource>();
@@ -32,7 +33,10 @@ public class CollisionHandler : MonoBehaviour
             return;
         }
         isTransitioning = true;
-        switch (other.gameObject.tag) {
+        string tag = other.gameObject.tag;
+
+        
+        switch (tag) {
             case "Friendly":
                 isTransitioning = false;
                 break;
@@ -50,7 +54,16 @@ public class CollisionHandler : MonoBehaviour
             default:
                 StartCrashSequence();
                 break;
-        }    
+        }
+        if (tag.Length > 0) {
+            Debug.Log("setting tag: " + tag);
+            collidedWith = tag;
+        }
+    }
+
+    void OnCollisionExit(Collision other) {
+        Debug.Log("removing tag");
+        collidedWith = "";
     }
 
     public void toggleCollisionsEnabled() {

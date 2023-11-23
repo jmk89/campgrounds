@@ -12,6 +12,7 @@ TagManager:
   - Gate2
   - Leaf
   - Ground
+  - PlayerSelector
   layers:
   - Default
   - TransparentFX

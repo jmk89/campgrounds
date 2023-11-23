@@ -280,7 +280,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1434919291969663668}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.4, z: 0}
+  m_LocalPosition: {x: 0, y: 1.23, z: 0}
   m_LocalScale: {x: 1, y: 3.7868, z: 1}
   m_Children:
   - {fileID: 2812464910284895327}
@@ -839,8 +839,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7553e55e999c0ad499c4bbc0a17b39bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationSpeed: 5
-  fartForce: 4
+  rotationSpeed: 250
+  fartForce: 3000
   mainBoosterParticles: {fileID: 7758582688395046070}
   leftBoosterParticles: {fileID: 6290658667642222749}
   rightBoosterParticles: {fileID: 613185378228027696}
@@ -959,6 +959,7 @@ MonoBehaviour:
   successParticles: {fileID: 5470347200574858304}
   crashParticles: {fileID: 3309140195216402446}
   collisionsEnabled: 1
+  collidedWith: 
 --- !u!65 &230258891080321078
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -970,8 +971,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 7.8506513, z: 1}
-  m_Center: {x: 0, y: 0.30290723, z: 0}
+  m_Size: {x: 1, y: 6.840541, z: 1}
+  m_Center: {x: 0, y: 0.80796254, z: 0}
 --- !u!114 &2431856220213469974
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -996,7 +997,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f77685cb6e46eb4469035745158346ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ch: {fileID: 1165411209}
 --- !u!1001 &44836756951686994
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -5,9 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class CheatCodes : MonoBehaviour
 {
-
-    [SerializeField] CollisionHandler ch;
-
     // Start is called before the first frame update
     void Start()
     {
