@@ -25,7 +25,6 @@ public class UnlockCharacter : MonoBehaviour
     }
 
     void Unlock(int characterToUnlock) {
-        Debug.Log("Unlocking");
         GameObject.FindGameObjectWithTag("PlayerSelector").GetComponent<PlayerSelector>().UnlockCharacter(characterToUnlock);
     } 
 }

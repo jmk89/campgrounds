@@ -19,7 +19,7 @@ public class CollisionHandler : MonoBehaviour
     public bool collisionsEnabled = true;
     public string collidedWith = "";
 
-    void Start() {
+    void Awake() {
         audioSource = GetComponent<AudioSource>();
     }
 
@@ -34,7 +34,6 @@ public class CollisionHandler : MonoBehaviour
         }
         isTransitioning = true;
         string tag = other.gameObject.tag;
-
         
         switch (tag) {
             case "Friendly":
@@ -56,13 +55,11 @@ public class CollisionHandler : MonoBehaviour
                 break;
         }
         if (tag.Length > 0) {
-            Debug.Log("setting tag: " + tag);
             collidedWith = tag;
         }
     }
 
     void OnCollisionExit(Collision other) {
-        Debug.Log("removing tag");
         collidedWith = "";
     }
 

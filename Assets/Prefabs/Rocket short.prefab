@@ -775,7 +775,7 @@ GameObject:
   - component: {fileID: 2431856220213469974}
   m_Layer: 0
   m_Name: Rocket short
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -957,6 +957,8 @@ MonoBehaviour:
   crash: {fileID: 8300000, guid: 08d62bcbd0eca2f43a29dd04bbeb39e5, type: 3}
   successParticles: {fileID: 5470347200574858304}
   crashParticles: {fileID: 3309140195216402446}
+  collisionsEnabled: 1
+  collidedWith: 
 --- !u!65 &230258891080321078
 BoxCollider:
   m_ObjectHideFlags: 0
