@@ -49,7 +49,6 @@ public class PlayerSelector : MonoBehaviour
 
     void Awake() {
         DontDestroyOnLoad(this);
-		
 	    if (instance == null) {
 		    instance = gameObject;
 	    } else {
@@ -98,12 +97,17 @@ public class PlayerSelector : MonoBehaviour
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         CollisionHandler collisionHandler = player?.GetComponent<CollisionHandler>();
         if (!collisionHandler || collisionHandler.collidedWith != "Friendly") {
+            Debug.Log("collision");
             return;
         }
         if (characters.Count <= (characterNumber - 1)) {
+            Debug.Log("count");
+
             return;
         }
         if (!characters.ElementAt(characterNumber).IsUnlocked()) {
+            Debug.Log("not unlocked");
+
             return;
         }
 

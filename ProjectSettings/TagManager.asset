@@ -14,6 +14,9 @@ TagManager:
   - Ground
   - PlayerSelector
   - FollowCam
+  - CharacterUnlock
+  - Coin
+  - InventoryManager
   layers:
   - Default
   - TransparentFX

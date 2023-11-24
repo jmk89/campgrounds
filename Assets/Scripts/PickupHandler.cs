@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
-public class UnlockCharacter : MonoBehaviour
+public class PickupHandler : MonoBehaviour
 {
-    [SerializeField] int characterToUnlock = 0;
+    [SerializeField] int characterToUnlock = -1;
     // Start is called before the first frame update
     void Start()
     {
@@ -21,10 +20,16 @@ public class UnlockCharacter : MonoBehaviour
         if (other.gameObject.tag != "Player") {
             return;
         }
-        Unlock(characterToUnlock);
+
+        switch(gameObject.tag) {
+            case "CharacterUnlock":
+                UnlockCharacter();
+                break;
+        }
+        gameObject.SetActive(false);
     }
 
-    void Unlock(int characterToUnlock) {
+    void UnlockCharacter() {
         GameObject.FindGameObjectWithTag("PlayerSelector").GetComponent<PlayerSelector>().UnlockCharacter(characterToUnlock);
-    } 
+    }
 }

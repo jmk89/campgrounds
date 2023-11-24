@@ -12,15 +12,20 @@ public class CollisionHandler : MonoBehaviour
     [SerializeField] ParticleSystem successParticles;
     [SerializeField] ParticleSystem crashParticles;
 
-    AudioSource audioSource;
-
-    bool isTransitioning = false;
-    int gateToRemove = 0;
     public bool collisionsEnabled = true;
     public string collidedWith = "";
 
+    AudioSource audioSource;
+    bool isTransitioning = false;
+    int gateToRemove = 0;
+    GameObject inventoryManager;
+
     void Awake() {
         audioSource = GetComponent<AudioSource>();
+    }
+
+    void Start() {
+        inventoryManager = GameObject.FindGameObjectWithTag("InventoryManager");
     }
 
     void Update()
@@ -50,6 +55,10 @@ public class CollisionHandler : MonoBehaviour
                 isTransitioning = false;
                 RemoveGate(2);
                 break;
+            case "Coin":
+                Debug.Log("Coin collision");
+                UpdateCoins(other.gameObject.GetComponent<Coin>().GetValue());
+                break;
             default:
                 StartCrashSequence();
                 break;
@@ -59,12 +68,35 @@ public class CollisionHandler : MonoBehaviour
         }
     }
 
+    void OnTriggerEnter(Collider other) {
+        string tag = other.gameObject.tag;
+        
+        switch (tag) {
+            case "Coin":
+                UpdateCoins(other.gameObject.GetComponent<Coin>().GetValue());
+                other.gameObject.SetActive(false);
+                break;
+            case "CharacterUnlock":
+                // UnlockCharacter(other.gameObject.GetComponent);
+                break;
+        }
+    }
+
     void OnCollisionExit(Collision other) {
         collidedWith = "";
     }
 
     public void toggleCollisionsEnabled() {
         collisionsEnabled = !collisionsEnabled;
+    }
+
+    void UnlockCharacter() {
+        // GameObject.FindGameObjectWithTag("PlayerSelector").GetComponent<PlayerSelector>().UnlockCharacter(characterToUnlock);
+    }
+
+    void UpdateCoins(int updateAmount) {
+        Debug.Log("Adding coins ");
+        inventoryManager.GetComponent<InventoryTracker>().UpdateCoins(updateAmount);
     }
 
     void RemoveGate(int gateNumber) {

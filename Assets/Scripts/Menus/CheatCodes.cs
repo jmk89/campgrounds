@@ -18,7 +18,7 @@ public class CheatCodes : MonoBehaviour
     }
 
     private void ProcessCheatCodes() {
-        if (Input.GetKey(KeyCode.L)) {
+        if (Input.GetKeyDown(KeyCode.L)) {
             int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
             int numberScenes = SceneManager.sceneCountInBuildSettings;
             currentSceneIndex++;
