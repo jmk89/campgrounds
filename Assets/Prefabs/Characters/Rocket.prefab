@@ -825,7 +825,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 120
+  m_Constraints: 32
   m_CollisionDetection: 0
 --- !u!114 &1165411202
 MonoBehaviour:
@@ -841,6 +841,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotationSpeed: 250
   fartForce: 3000
+  autoRotateSpeed: 1
   mainBoosterParticles: {fileID: 7758582688395046070}
   leftBoosterParticles: {fileID: 6290658667642222749}
   rightBoosterParticles: {fileID: 613185378228027696}
