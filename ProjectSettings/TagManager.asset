@@ -17,6 +17,7 @@ TagManager:
   - CharacterUnlock
   - Coin
   - InventoryManager
+  - 3rdPersonFollowCam
   layers:
   - Default
   - TransparentFX

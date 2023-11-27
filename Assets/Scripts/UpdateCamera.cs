@@ -18,6 +18,12 @@ public class UpdateCamera : MonoBehaviour
     }
 
     public void updateFollowTarget(GameObject gameObject) {
-        GetComponent<CinemachineVirtualCamera>().Follow = gameObject.transform;
+        CinemachineVirtualCamera cam = GetComponent<CinemachineVirtualCamera>();
+
+
+        cam.Follow = gameObject.transform;
+        cam.LookAt = gameObject.transform;
+        
+
     }
 }

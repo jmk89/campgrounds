@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Cinemachine;
 using UnityEngine;
 
 public class MovementRocket : MonoBehaviour
@@ -7,6 +7,7 @@ public class MovementRocket : MonoBehaviour
     [SerializeField] float rotationSpeed = 1f;
     [SerializeField] float translationSpeed = 20000f;
     [SerializeField] float autoRotateSpeed = 3f;
+    [SerializeField] float mouseSensitivity = 1f;
 
     [Header ("Continuous Thrust")]
     [SerializeField] float thrustForceContinuous = 3000f;
@@ -29,6 +30,7 @@ public class MovementRocket : MonoBehaviour
     AudioSource audioSource;
     Vector3 into = new Vector3(1, 0, 0);
     Vector3 outOf = new Vector3(-1, 0, 0);
+    Vector2 mouseTurn;
     Quaternion zRotation = new Quaternion(0.7f, 0f, 0f, 0.7f);
     Quaternion autoRotateTo = Quaternion.identity;
     MovementMode movementMode = MovementMode.Rotation;
@@ -118,8 +120,6 @@ public class MovementRocket : MonoBehaviour
     }
 
     void ProcessRotation() {
-        Quaternion q = transform.rotation;
-
         if (autoRotating) {
             AutoRotate(autoRotateTo);
         } else if (movementMode == MovementMode.Rotation) {
@@ -167,6 +167,19 @@ public class MovementRocket : MonoBehaviour
                 leftBoosterParticles.Play();
             }
         }
+        
+        if (Input.GetMouseButton(1)) {
+            Cursor.lockState = CursorLockMode.Locked;
+            mouseTurn.x += Input.GetAxis("Mouse X") * mouseSensitivity;
+            mouseTurn.y += Input.GetAxis("Mouse Y") * mouseSensitivity;
+            transform.localRotation = Quaternion.Euler(-mouseTurn.y, mouseTurn.x, 0);
+        } 
+        
+        if (Input.GetMouseButtonUp(1)) {
+            Cursor.lockState = CursorLockMode.None;
+        }
+
+
         if (Input.GetKey(KeyCode.W)) {
             ApplyRotation(rotationSpeed, into);
 

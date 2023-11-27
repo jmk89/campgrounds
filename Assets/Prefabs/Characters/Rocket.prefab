@@ -841,14 +841,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotationSpeed: 250
   translationSpeed: 50
-  thrustForceContinous: 3000
+  autoRotateSpeed: 1
+  mouseSensitivity: 3
+  thrustForceContinuous: 3000
+  thrustModeContinuousDrag: 0.25
+  thrustModeContinuousMass: 2
   thrustForcePeriodic: 80
   thrustPeriodicWait: 1
   thrustModePeriodicDrag: 2
   thrustModePeriodicMass: 2
-  thrustModeContinuousDrag: 0.25
-  thrustModeContinuousMass: 2
-  autoRotateSpeed: 1
   mainBoosterParticles: {fileID: 7758582688395046070}
   leftBoosterParticles: {fileID: 6290658667642222749}
   rightBoosterParticles: {fileID: 613185378228027696}

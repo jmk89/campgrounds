@@ -129,17 +129,18 @@ public class PlayerSelector : MonoBehaviour
         Character character = characters.ElementAt(characterNumber);
         GameObject launchPad = GameObject.FindGameObjectWithTag("Friendly");
         Vector3 launchPadPosition = launchPad.transform.position;
-        Vector3 spawnPosition = new Vector3(launchPadPosition.x, -500, 0);
+        Vector3 spawnPosition = new Vector3(launchPadPosition.x, -500, launchPadPosition.z);
         GameObject spawned = Instantiate(character.GetObject(), spawnPosition, Quaternion.identity);
 
         float spawnedHeight = spawned.GetComponent<BoxCollider>().bounds.size.y;
         float topOfLaunchPad = launchPadPosition.y + (launchPad.GetComponent<BoxCollider>().bounds.size.y / 2) ;
         float ySpawnPosition = topOfLaunchPad + (spawnedHeight / 2);
         
-        spawned.transform.position = new Vector3(spawnPosition.x, ySpawnPosition, 0);
+        spawned.transform.position = new Vector3(spawnPosition.x, ySpawnPosition, launchPadPosition.z);
         spawned.tag = "Player";
         spawned.SetActive(true);
-        GameObject.FindGameObjectWithTag("FollowCam")?.GetComponent<UpdateCamera>()?.updateFollowTarget(spawned);
+        GameObject.FindGameObjectWithTag("3rdPersonFollowCam")?.GetComponent<UpdateCamera>()?.updateFollowTarget(spawned);
+        
     }
 }
 
