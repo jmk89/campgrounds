@@ -3,14 +3,26 @@ using UnityEngine;
 
 public class MovementRocket : MonoBehaviour
 {
+    [Header ("Movements")]
     [SerializeField] float rotationSpeed = 1f;
     [SerializeField] float translationSpeed = 20000f;
-    [SerializeField] float fartForce = 1f;
     [SerializeField] float autoRotateSpeed = 3f;
+
+    [Header ("Continuous Thrust")]
+    [SerializeField] float thrustForceContinuous = 3000f;
+    [SerializeField] float thrustModeContinuousDrag = .5f;
+    [SerializeField] float thrustModeContinuousMass = 1f;
+
+    [Header ("Periodic Thrust")]
+    [SerializeField] float thrustForcePeriodic = 5000f;
+    [SerializeField] float thrustPeriodicWait = 1f;
+    [SerializeField] float thrustModePeriodicDrag = 5f;
+    [SerializeField] float thrustModePeriodicMass = 1f;
+    
+    [Header ("Particles & Sound")]
     [SerializeField] ParticleSystem mainBoosterParticles;
     [SerializeField] ParticleSystem leftBoosterParticles;
     [SerializeField] ParticleSystem rightBoosterParticles;
-    
     [SerializeField] AudioClip mainFartEngine;
 
     Rigidbody rb;
@@ -19,15 +31,20 @@ public class MovementRocket : MonoBehaviour
     Vector3 outOf = new Vector3(-1, 0, 0);
     Quaternion zRotation = new Quaternion(0.7f, 0f, 0f, 0.7f);
     Quaternion autoRotateTo = Quaternion.identity;
-    MovementMode movementMode;
+    MovementMode movementMode = MovementMode.Rotation;
+    ThrustMode thrustMode = ThrustMode.Continuous;
     bool autoRotating = false;
     float slerpTime = 0f;
+    float thrustTimeSinceLast = 0f;
     enum MovementMode {Rotation, Translation};
+    enum ThrustMode {Continuous, Periodic};
 
     // Start is called before the first frame update
     void Start() {
         rb = GetComponent<Rigidbody>();
         audioSource = GetComponent<AudioSource>();
+        thrustTimeSinceLast = thrustPeriodicWait;
+        SetDragAndMass(thrustModeContinuousDrag, thrustModeContinuousMass);
     }
 
     // Update is called once per frame
@@ -45,27 +62,47 @@ public class MovementRocket : MonoBehaviour
     }
 
     void ProcessMovements() {
-        if (this.movementMode == MovementMode.Translation) {
-        ProcessTranslation();
+        if (movementMode == MovementMode.Translation) {
+            ProcessTranslation();
         }
-        ProcessRotation();
+            ProcessRotation();
     }
 
     void ProcessTranslation() {
         Input.GetAxisRaw("Horizontal");
 
-        float xValue = Input.GetAxisRaw("Horizontal") * Time.deltaTime * translationSpeed * 30f;
-        float yValue = Input.GetAxisRaw("Vertical") * Time.deltaTime * translationSpeed * 30f;
-        // Debug.Log("translating x: " + xValue + ". translating y: " + yValue);
-        transform.Translate(xValue, 0f, yValue);
+        float xValue = Input.GetAxisRaw("Horizontal") * Time.deltaTime * translationSpeed;
+        float yValue = Input.GetAxisRaw("Vertical") * Time.deltaTime * translationSpeed;
+        Debug.Log("translating x: " + xValue + ". translating y: " + yValue);
+        transform.Translate(xValue, 0f, -yValue);
     }
 
     void ProcessThrust() {
-        if (Input.GetKey(KeyCode.Space)) {
-            StartThrusting();
+        if (Input.GetKeyDown(KeyCode.E)) {
+            if (thrustMode == ThrustMode.Continuous) {
+                thrustMode = ThrustMode.Periodic;
+                SetDragAndMass(thrustModePeriodicDrag, thrustModePeriodicMass);
+            } else {
+                thrustMode = ThrustMode.Continuous;
+                SetDragAndMass(thrustModeContinuousDrag, thrustModeContinuousMass);
+            }
+        }
+
+        if (Input.GetKey(KeyCode.Space) && thrustMode == ThrustMode.Continuous) {
+            StartThrusting(thrustForceContinuous, ForceMode.Force);
+        } else if (Input.GetKey(KeyCode.Space) && thrustMode == ThrustMode.Periodic && thrustTimeSinceLast >= thrustPeriodicWait) {
+            StartThrusting(thrustForcePeriodic, ForceMode.Impulse);
+            thrustTimeSinceLast = 0f;
         } else {
             StopThrusting();
         }
+
+        thrustTimeSinceLast += Time.deltaTime;
+    }
+
+    void SetDragAndMass(float drag, float mass) {
+        rb.drag = drag;
+        rb.mass = mass;
     }
 
     void ProcessAutoRotation() {
@@ -109,9 +146,7 @@ public class MovementRocket : MonoBehaviour
             rb.freezeRotation = false;
             autoRotating = false;
             slerpTime = 0f;
-            if (movementMode == MovementMode.Translation) {
-                rb.useGravity = false;
-            }
+            rb.useGravity = movementMode == MovementMode.Translation ? false : true;
             return;
         } else {
             slerpTime += Time.deltaTime;
@@ -160,13 +195,16 @@ public class MovementRocket : MonoBehaviour
         }
     }
 
-    private void StartThrusting() {
+    private void StartThrusting(float thrustForce, ForceMode forceMode) {
         if (!audioSource.isPlaying) {
             audioSource.PlayOneShot(mainFartEngine);
         }
         if (!mainBoosterParticles.isPlaying) {
             mainBoosterParticles.Play();
         }
-        rb.AddRelativeForce(Vector3.up * fartForce * Time.deltaTime);
+
+        Vector3 forceToAdd = Vector3.up * thrustForce;
+        forceToAdd *= forceMode == ForceMode.Force ? Time.deltaTime : 1;
+        rb.AddRelativeForce(forceToAdd, forceMode);
     }
 }
