@@ -18,6 +18,8 @@ TagManager:
   - Coin
   - InventoryManager
   - 3rdPersonFollowCam
+  - FreeLookCam
+  - CameraManager
   layers:
   - Default
   - TransparentFX

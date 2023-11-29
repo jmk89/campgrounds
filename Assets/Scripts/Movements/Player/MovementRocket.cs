@@ -34,7 +34,7 @@ public class MovementRocket : MonoBehaviour
     Quaternion zRotation = new Quaternion(0.7f, 0f, 0f, 0.7f);
     Quaternion autoRotateTo = Quaternion.identity;
     MovementMode movementMode = MovementMode.Rotation;
-    ThrustMode thrustMode = ThrustMode.Continuous;
+    ThrustMode thrustMode = ThrustMode.Periodic;
     bool autoRotating = false;
     float slerpTime = 0f;
     float thrustTimeSinceLast = 0f;
@@ -46,7 +46,7 @@ public class MovementRocket : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         audioSource = GetComponent<AudioSource>();
         thrustTimeSinceLast = thrustPeriodicWait;
-        SetDragAndMass(thrustModeContinuousDrag, thrustModeContinuousMass);
+        SetDragAndMass(thrustModePeriodicDrag, thrustModePeriodicMass);
     }
 
     // Update is called once per frame
@@ -170,13 +170,19 @@ public class MovementRocket : MonoBehaviour
         
         if (Input.GetMouseButton(1)) {
             Cursor.lockState = CursorLockMode.Locked;
+            rb.freezeRotation = false;
+
             mouseTurn.x += Input.GetAxis("Mouse X") * mouseSensitivity;
             mouseTurn.y += Input.GetAxis("Mouse Y") * mouseSensitivity;
-            transform.localRotation = Quaternion.Euler(-mouseTurn.y, mouseTurn.x, 0);
+            Quaternion desiredRotation = Quaternion.Euler(-mouseTurn.y, mouseTurn.x, 0);
+            
+            transform.rotation = Quaternion.Euler(-mouseTurn.y, mouseTurn.x, 0);
         } 
         
         if (Input.GetMouseButtonUp(1)) {
             Cursor.lockState = CursorLockMode.None;
+            rb.freezeRotation = true;
+            rb.freezeRotation = false;
         }
 
 

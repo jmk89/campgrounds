@@ -139,8 +139,11 @@ public class PlayerSelector : MonoBehaviour
         spawned.transform.position = new Vector3(spawnPosition.x, ySpawnPosition, launchPadPosition.z);
         spawned.tag = "Player";
         spawned.SetActive(true);
-        GameObject.FindGameObjectWithTag("3rdPersonFollowCam")?.GetComponent<UpdateCamera>()?.updateFollowTarget(spawned);
         
+        
+        CameraManager cameraManagerScript = GameObject.FindGameObjectWithTag("CameraManager").GetComponent<CameraManager>();
+        cameraManagerScript.UpdateAllCameraTargets(spawned);
+        cameraManagerScript.UpdateActiveCamera(CameraManager.CameraType.Follow);        
     }
 }
 
