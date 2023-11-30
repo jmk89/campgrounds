@@ -31,6 +31,7 @@ public class MovementRocket : MonoBehaviour
     Vector3 into = new Vector3(1, 0, 0);
     Vector3 outOf = new Vector3(-1, 0, 0);
     Vector2 mouseTurn;
+    bool mouseUp = true;
     Quaternion zRotation = new Quaternion(0.7f, 0f, 0f, 0.7f);
     Quaternion autoRotateTo = Quaternion.identity;
     MovementMode movementMode = MovementMode.Rotation;
@@ -41,12 +42,15 @@ public class MovementRocket : MonoBehaviour
     enum MovementMode {Rotation, Translation};
     enum ThrustMode {Continuous, Periodic};
 
+    CameraManager cameraManagerScript;
+
     // Start is called before the first frame update
     void Start() {
         rb = GetComponent<Rigidbody>();
         audioSource = GetComponent<AudioSource>();
         thrustTimeSinceLast = thrustPeriodicWait;
         SetDragAndMass(thrustModePeriodicDrag, thrustModePeriodicMass);
+        cameraManagerScript = GameObject.FindGameObjectWithTag("CameraManager").GetComponent<CameraManager>();
     }
 
     // Update is called once per frame
@@ -54,13 +58,6 @@ public class MovementRocket : MonoBehaviour
         ProcessThrust();
         ProcessAutoRotation();
         ProcessMovements();
-
-        if (Input.GetKeyDown(KeyCode.Q)) {
-            Debug.Log("x: " + (autoRotateTo.x - zRotation.x));
-            Debug.Log("y: " + (autoRotateTo.y - zRotation.y));
-            Debug.Log("z: " + (autoRotateTo.z - zRotation.z));
-
-        }
     }
 
     void ProcessMovements() {
@@ -75,7 +72,6 @@ public class MovementRocket : MonoBehaviour
 
         float xValue = Input.GetAxisRaw("Horizontal") * Time.deltaTime * translationSpeed;
         float yValue = Input.GetAxisRaw("Vertical") * Time.deltaTime * translationSpeed;
-        Debug.Log("translating x: " + xValue + ". translating y: " + yValue);
         transform.Translate(xValue, 0f, -yValue);
     }
 
@@ -131,6 +127,7 @@ public class MovementRocket : MonoBehaviour
     private void ApplyRotation(float rotationThisFrame, Vector3 rotationVector) {
         rb.freezeRotation = true;
         transform.Rotate(rotationVector * rotationThisFrame * Time.deltaTime);
+        Debug.Log("Key rotation: " + transform.rotation);
         rb.freezeRotation = false;
     }
 
@@ -170,17 +167,24 @@ public class MovementRocket : MonoBehaviour
         
         if (Input.GetMouseButton(1)) {
             Cursor.lockState = CursorLockMode.Locked;
-            rb.freezeRotation = false;
+            cameraManagerScript.UpdateActiveCamera(CameraManager.CameraType.Follow);
+            if (mouseUp) {
+                mouseUp = false;
+                mouseTurn.x = transform.rotation.x;
+                mouseTurn.y = transform.rotation.y;
+                Debug.Log("Mouse down: " + transform.rotation);
+            }
+
 
             mouseTurn.x += Input.GetAxis("Mouse X") * mouseSensitivity;
             mouseTurn.y += Input.GetAxis("Mouse Y") * mouseSensitivity;
-            Quaternion desiredRotation = Quaternion.Euler(-mouseTurn.y, mouseTurn.x, 0);
-            
             transform.rotation = Quaternion.Euler(-mouseTurn.y, mouseTurn.x, 0);
         } 
         
         if (Input.GetMouseButtonUp(1)) {
             Cursor.lockState = CursorLockMode.None;
+            // mouseTurn = new Vector2();
+            mouseUp = true;
             rb.freezeRotation = true;
             rb.freezeRotation = false;
         }
@@ -188,7 +192,6 @@ public class MovementRocket : MonoBehaviour
 
         if (Input.GetKey(KeyCode.W)) {
             ApplyRotation(rotationSpeed, into);
-
         }
         else if (Input.GetKey(KeyCode.S)) {
             ApplyRotation(rotationSpeed, outOf);

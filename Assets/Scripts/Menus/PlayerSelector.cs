@@ -75,25 +75,11 @@ public class PlayerSelector : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        ProcessCharacterSelection();
-    }
-
     public void UnlockCharacter(int characterNumber) {
         characters.ElementAt(characterNumber).SetUnlocked(true);
     }
 
-    void ProcessCharacterSelection() {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            SelectCharacter(0);
-        } else if (Input.GetKeyDown(KeyCode.Alpha2)){
-            SelectCharacter(1);
-        }
-    }
-
-    void SelectCharacter(int characterNumber) {
+    public void SelectCharacter(int characterNumber) {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         CollisionHandler collisionHandler = player?.GetComponent<CollisionHandler>();
         if (!collisionHandler || collisionHandler.collidedWith != "Friendly") {
@@ -143,7 +129,7 @@ public class PlayerSelector : MonoBehaviour
         
         CameraManager cameraManagerScript = GameObject.FindGameObjectWithTag("CameraManager").GetComponent<CameraManager>();
         cameraManagerScript.UpdateAllCameraTargets(spawned);
-        cameraManagerScript.UpdateActiveCamera(CameraManager.CameraType.Follow);        
+        cameraManagerScript.UpdateActiveCamera(CameraManager.CameraType.FramingTransposer);        
     }
 }
 

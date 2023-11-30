@@ -6,21 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/campground.unity
+    path: Assets/Scenes/DeveloperIsland.unity
     guid: 05cbe28fe20da7b468accce87a07053f
   - enabled: 1
     path: Assets/Scenes/Over.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
-  - enabled: 0
-    path: Assets/Scenes/Under.unity
-    guid: 18acbcf2d295c4b4a86574d740154223
-  - enabled: 0
-    path: Assets/Scenes/Reverse.unity
-    guid: 8a418ebfc39faba4b8796061e5fb21f0
-  - enabled: 0
-    path: Assets/Scenes/Mover.unity
-    guid: b80fae0374b1e9e45ad0e27eec32fff8
-  - enabled: 0
-    path: Assets/Scenes/Circulator.unity
-    guid: ecfb4a734fcd19f4ea1ef0bf300e9ae7
   m_configObjects: {}

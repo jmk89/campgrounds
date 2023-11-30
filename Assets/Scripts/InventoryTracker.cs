@@ -21,7 +21,6 @@ public class InventoryTracker : MonoBehaviour
     
     public void UpdateCoins(int updateAmount) {
         totalCoins += updateAmount;
-        Debug.Log("InventoryTracker totalCoins " + totalCoins);
         coinText.text = "Coins: " + totalCoins;
     }
     

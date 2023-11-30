@@ -56,7 +56,6 @@ public class CollisionHandler : MonoBehaviour
                 RemoveGate(2);
                 break;
             case "Coin":
-                Debug.Log("Coin collision");
                 UpdateCoins(other.gameObject.GetComponent<Coin>().GetValue());
                 break;
             default:
@@ -95,7 +94,6 @@ public class CollisionHandler : MonoBehaviour
     }
 
     void UpdateCoins(int updateAmount) {
-        Debug.Log("Adding coins ");
         inventoryManager.GetComponent<InventoryTracker>().UpdateCoins(updateAmount);
     }
 

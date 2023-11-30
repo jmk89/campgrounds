@@ -772,7 +772,6 @@ GameObject:
   - component: {fileID: 1165411208}
   - component: {fileID: 1165411209}
   - component: {fileID: 230258891080321078}
-  - component: {fileID: 2431856220213469974}
   m_Layer: 0
   m_Name: Rocket short
   m_TagString: Player
@@ -839,7 +838,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 250
-  fartForce: 3000
+  translationSpeed: 20000
+  autoRotateSpeed: 3
+  mouseSensitivity: 1
+  thrustForceContinuous: 3000
+  thrustModeContinuousDrag: 0.5
+  thrustModeContinuousMass: 1
+  thrustForcePeriodic: 5000
+  thrustPeriodicWait: 1
+  thrustModePeriodicDrag: 5
+  thrustModePeriodicMass: 1
   mainBoosterParticles: {fileID: 7758582688395046070}
   leftBoosterParticles: {fileID: 6290658667642222749}
   rightBoosterParticles: {fileID: 613185378228027696}
@@ -972,18 +980,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 7.8506513, z: 1}
   m_Center: {x: 0, y: 0.30290723, z: 0}
---- !u!114 &2431856220213469974
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9057081882020742188}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ce59fb1cbe717843940d723c77195c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &44836756951686994
 PrefabInstance:
   m_ObjectHideFlags: 0
