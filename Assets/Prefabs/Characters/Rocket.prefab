@@ -838,10 +838,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7553e55e999c0ad499c4bbc0a17b39bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationSpeed: 250
+  rotationSpeed: 100
   translationSpeed: 50
   autoRotateSpeed: 1
-  mouseSensitivity: 3
+  mouseSensitivity: 100
   thrustForceContinuous: 3000
   thrustModeContinuousDrag: 0.25
   thrustModeContinuousMass: 2

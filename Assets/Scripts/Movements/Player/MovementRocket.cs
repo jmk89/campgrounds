@@ -1,5 +1,4 @@
-﻿using Cinemachine;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class MovementRocket : MonoBehaviour
 {
@@ -30,8 +29,6 @@ public class MovementRocket : MonoBehaviour
     AudioSource audioSource;
     Vector3 into = new Vector3(1, 0, 0);
     Vector3 outOf = new Vector3(-1, 0, 0);
-    Vector2 mouseTurn;
-    bool mouseUp = true;
     Quaternion zRotation = new Quaternion(0.7f, 0f, 0f, 0.7f);
     Quaternion autoRotateTo = Quaternion.identity;
     MovementMode movementMode = MovementMode.Rotation;
@@ -127,7 +124,6 @@ public class MovementRocket : MonoBehaviour
     private void ApplyRotation(float rotationThisFrame, Vector3 rotationVector) {
         rb.freezeRotation = true;
         transform.Rotate(rotationVector * rotationThisFrame * Time.deltaTime);
-        Debug.Log("Key rotation: " + transform.rotation);
         rb.freezeRotation = false;
     }
 
@@ -164,37 +160,26 @@ public class MovementRocket : MonoBehaviour
                 leftBoosterParticles.Play();
             }
         }
-        
-        if (Input.GetMouseButton(1)) {
-            Cursor.lockState = CursorLockMode.Locked;
-            cameraManagerScript.UpdateActiveCamera(CameraManager.CameraType.Follow);
-            if (mouseUp) {
-                mouseUp = false;
-                mouseTurn.x = transform.rotation.x;
-                mouseTurn.y = transform.rotation.y;
-                Debug.Log("Mouse down: " + transform.rotation);
-            }
-
-
-            mouseTurn.x += Input.GetAxis("Mouse X") * mouseSensitivity;
-            mouseTurn.y += Input.GetAxis("Mouse Y") * mouseSensitivity;
-            transform.rotation = Quaternion.Euler(-mouseTurn.y, mouseTurn.x, 0);
-        } 
-        
-        if (Input.GetMouseButtonUp(1)) {
-            Cursor.lockState = CursorLockMode.None;
-            // mouseTurn = new Vector2();
-            mouseUp = true;
-            rb.freezeRotation = true;
-            rb.freezeRotation = false;
-        }
-
-
         if (Input.GetKey(KeyCode.W)) {
             ApplyRotation(rotationSpeed, into);
         }
         else if (Input.GetKey(KeyCode.S)) {
             ApplyRotation(rotationSpeed, outOf);
+        }
+        
+        if (Input.GetMouseButton(1)) {
+            Cursor.lockState = CursorLockMode.Locked;
+            cameraManagerScript.UpdateActiveCamera(CameraManager.CameraType.Follow);
+            float xAxis = Input.GetAxis("Mouse X");
+            float yAxis = Input.GetAxis("Mouse Y");
+
+            ApplyRotation(mouseSensitivity, new Vector3(-yAxis, 0, -xAxis));
+        } 
+        
+        if (Input.GetMouseButtonUp(1)) {
+            Cursor.lockState = CursorLockMode.None;
+            rb.freezeRotation = true;
+            rb.freezeRotation = false;
         }
 
     }
