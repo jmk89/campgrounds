@@ -1,71 +1,97 @@
 ﻿using UnityEngine;
 using Cinemachine;
+using System;
+using System.Collections.Generic;
 
 public class CameraManager : MonoBehaviour
 {
 
-    [SerializeField] GameObject framingTransposerCam;
-    [SerializeField] GameObject followCam;
-    [SerializeField] GameObject freeLookCam;
-
-    public enum CameraType {FramingTransposer, Follow, FreeLook};
-
-    private CameraType activeCameraType = CameraType.FramingTransposer;
-    private CameraType lastActiveCameraType = CameraType.FramingTransposer;
-
-    public void FreeCamActivate() {
-        Cursor.lockState = CursorLockMode.Locked;
-        lastActiveCameraType = activeCameraType;
-        UpdateActiveCamera(CameraType.FreeLook);
+    [System.Serializable]
+    public struct MyCamera {
+        public GameObject Camera;
+        public CameraType CameraType;
+        public CameraType NextCameraType;
     }
 
-    public void FreeCamDeactivate() {
-        Cursor.lockState = CursorLockMode.None;
-        UpdateActiveCamera(lastActiveCameraType);
+    [Header ("Camera List")]
+    [SerializeField] List<MyCamera> myCameras;
+    [Header ("Follow Cam Shake Settings")]
+    [SerializeField] float maxShake = .33f;
+    [Header ("Follow Cam FOV Settings")]
+    [SerializeField] float FOVAtRest = 47f;
+    [SerializeField] float FOVAdjustAfterSpeed = 50f;
+    [SerializeField] float FOVAdjustmentRatio = 5f;
+    [SerializeField] float FOVMax = 90f;
+
+    [System.Serializable]
+    public enum CameraType {FramingTransposer, FollowNormalFOV, FollowMaxFOV, FreeLook};
+
+    private MyCamera activeCam;
+    private GameObject player;
+    private float playerVelocity;
+
+    void Update() {
+        ProcessFollowCamFOV();
+        ProcessFollowCamShake();
+    }
+
+    public void ProcessFollowCamShake() {
+        CinemachineVirtualCamera followCamVirtualCamera = myCameras
+            .Find(cam => cam.CameraType == CameraType.FollowNormalFOV).Camera.GetComponent<CinemachineVirtualCamera>();
+        float currentFOV = followCamVirtualCamera.m_Lens.FieldOfView;
+        float fovRatio = (currentFOV - FOVAtRest) / (FOVMax - FOVAtRest);
+        float shakeAmount = fovRatio * maxShake;
+        followCamVirtualCamera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_AmplitudeGain = shakeAmount;
+        
+    }
+
+    public void ProcessFollowCamFOV() {
+        playerVelocity = player.GetComponent<Rigidbody>().velocity.magnitude;
+        CinemachineVirtualCamera followCamVirtualCamera = myCameras
+            .Find(cam => cam.CameraType == CameraType.FollowNormalFOV).Camera.GetComponent<CinemachineVirtualCamera>();
+        float diff = playerVelocity - FOVAdjustAfterSpeed;
+        float FOVAdjustment = playerVelocity / FOVAdjustmentRatio;
+
+        if (FOVAtRest + FOVAdjustment >= FOVMax) {
+            followCamVirtualCamera.m_Lens.FieldOfView = FOVMax;
+        } else {
+            followCamVirtualCamera.m_Lens.FieldOfView = FOVAtRest + FOVAdjustment;
+        }
+    }
+
+    void UpdatePlayerReference(GameObject obj) {
+        player = obj;
     }
 
     public void CycleCameraType() {
-        switch (activeCameraType) {
-            case CameraType.FramingTransposer:
-                UpdateActiveCamera(CameraType.Follow);
-                break;
-            case CameraType.Follow:
-                UpdateActiveCamera(CameraType.FreeLook);
-                break;
-            case CameraType.FreeLook:
-                UpdateActiveCamera(CameraType.FramingTransposer);
-                break;
-        }
+        UpdateActiveCamera(activeCam.NextCameraType);
     }
 
     public void UpdateActiveCamera(CameraType cameraTypeToActivate) {
-        activeCameraType = cameraTypeToActivate;
-        switch (cameraTypeToActivate) {
-            case CameraType.FramingTransposer:
-                framingTransposerCam.GetComponent<CinemachineVirtualCamera>().enabled = true;
-                followCam.GetComponent<CinemachineVirtualCamera>().enabled = false;
-                freeLookCam.GetComponent<CinemachineFreeLook>().enabled = false;
-                break;
-            case CameraType.Follow:
-                framingTransposerCam.GetComponent<CinemachineVirtualCamera>().enabled = false;
-                followCam.GetComponent<CinemachineVirtualCamera>().enabled = true;
-                freeLookCam.GetComponent<CinemachineFreeLook>().enabled = false;
-                break;
-            case CameraType.FreeLook:
-                framingTransposerCam.GetComponent<CinemachineVirtualCamera>().enabled = false;
-                followCam.GetComponent<CinemachineVirtualCamera>().enabled = false;
-                freeLookCam.GetComponent<CinemachineFreeLook>().enabled = true;
-                break;
-        }
+        activeCam = myCameras.Find(cam => cam.CameraType == cameraTypeToActivate);
+        activeCam.Camera.SetActive(true);
+        myCameras
+            .FindAll(cam => cam.CameraType != cameraTypeToActivate)
+            .ForEach(cam => cam.Camera.SetActive(false));
     }
 
     public void UpdateAllCameraTargets(GameObject character) {
-        framingTransposerCam.GetComponent<CinemachineVirtualCamera>().Follow = character.transform;
+        UpdatePlayerReference(character);
+        List<CameraType> camerasWithLookAtTarget = new List<CameraType>() {CameraType.FollowNormalFOV, CameraType.FollowMaxFOV, CameraType.FreeLook};
+        
+        myCameras.ForEach(cam => {
+            cam.Camera.GetComponent<CinemachineVirtualCameraBase>().Follow = character.transform;
+            if (camerasWithLookAtTarget.Contains(cam.CameraType)) {
+                cam.Camera.GetComponent<CinemachineVirtualCameraBase>().LookAt = character.transform;
+            }
+            if (cam.CameraType == CameraType.FreeLook) {
+                cam.Camera.GetComponent<CinemachineFreeLook>().m_XAxis.Value = 0f;
+            }
+        });
+    }
 
-        followCam.GetComponent<CinemachineVirtualCamera>().Follow = character.transform;
-        followCam.GetComponent<CinemachineVirtualCamera>().LookAt = character.transform;
-
-        freeLookCam.GetComponent<CinemachineFreeLook>().Follow = character.transform;
-        freeLookCam.GetComponent<CinemachineFreeLook>().LookAt = character.transform;
+    public void UpdateTransitionTime(float time) {
+        CinemachineBlendDefinition def = new CinemachineBlendDefinition(CinemachineBlendDefinition.Style.EaseInOut, time);
+        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineBrain>().m_DefaultBlend = def;
     }
 }

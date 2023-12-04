@@ -138,7 +138,7 @@ public class CollisionHandler : MonoBehaviour
 
     void StartCrashSequence() {
         audioSource.Stop();
-        GetComponent<MovementRocket>().enabled = false;
+        GetComponent<NoPhysicsMovementScript>().enabled = false;
         audioSource.PlayOneShot(crash);
         crashParticles.Play();
         Invoke("ReloadLevel", loadDelay);
@@ -153,7 +153,7 @@ public class CollisionHandler : MonoBehaviour
 
     void StartLoadNextScene() {
         audioSource.Stop();
-        GetComponent<MovementRocket>().enabled = false;
+        GetComponent<NoPhysicsMovementScript>().enabled = false;
         audioSource.PlayOneShot(success);
         successParticles.Play();
         Invoke("LoadNextLevel", loadDelay);

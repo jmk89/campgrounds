@@ -1,21 +1,23 @@
 ﻿using UnityEngine;
 
-public class MovementRocket : MonoBehaviour
+public class NoPhysicsMovementScript : MonoBehaviour
 {
     [Header ("Movements")]
-    [SerializeField] float rotationSpeed = 1f;
-    [SerializeField] float translationSpeed = 20000f;
-    [SerializeField] float autoRotateSpeed = 3f;
-    [SerializeField] float mouseSensitivity = 1f;
+    [SerializeField] float rotationSpeed = 80f;
+    [SerializeField] float translationSpeed = 50f;
+    [SerializeField] float autoRotateSpeed = 1f;
+    [SerializeField] float mouseSensitivity = 300f;
 
     [Header ("Continuous Thrust")]
-    [SerializeField] float thrustContinuous = 3000f;
-    [SerializeField] float continuousDrag = .5f;
-    [SerializeField] float continuousMass = 1f;
+    [SerializeField] float thrustContinuous = 10000f;
+    [SerializeField] float boost = 30000f;
+    [SerializeField] float boostSeconds = 3f;
+    [SerializeField] float continuousDrag = 2f;
+    [SerializeField] float continuousMass = 2f;
 
     [Header ("Periodic Thrust")]
-    [SerializeField] float thrustPeriodic = 5000f;
-    [SerializeField] float thrustPause = 1f;
+    [SerializeField] float thrustPeriodic = 80f;
+    [SerializeField] float thrustPause = 0.75f;
     [SerializeField] float periodicDrag = 5f;
     [SerializeField] float periodicMass = 1f;
     
@@ -31,13 +33,14 @@ public class MovementRocket : MonoBehaviour
     Quaternion autoRotateTo = Quaternion.identity;
     MovementMode movementMode = MovementMode.Rotation;
     ThrustMode thrustMode = ThrustMode.Continuous;
+    bool initialZMovementInitiated = false;
     bool autoRotating = false;
     float slerpTime = 0f;
     float thrustTimeSinceLast = 0f;
+    float boostTime = 0f;
+    bool processingBoost = false;
     enum MovementMode {Rotation, Translation};
     enum ThrustMode {Continuous, Periodic};
-    Vector3 rightPosition;
-    Vector3 leftPosition;
     CameraManager cameraManagerScript;
 
     void Start() {
@@ -51,6 +54,7 @@ public class MovementRocket : MonoBehaviour
     void Update() {
         ProcessThrustMode();
         ProcessThrust();
+        ProcessBoost();
         ProcessAutoRotation();
         ProcessMovements();
     }
@@ -81,6 +85,26 @@ public class MovementRocket : MonoBehaviour
         transform.Translate(xValue, 0f, -yValue);
     }
 
+    void ApplyBoost() {
+        if (boostTime > boostSeconds) {
+            boostTime = 0f;
+            processingBoost = false;
+            return;
+        }
+        boostTime += Time.deltaTime;
+        rb.AddRelativeForce(Vector3.up * boost * Time.deltaTime);
+    }
+
+    void ProcessBoost() {
+        if (Input.GetKeyDown(KeyCode.F) && thrustMode == ThrustMode.Continuous && boostTime == 0) {
+            processingBoost = true;
+        }
+
+        if (processingBoost) {
+            ApplyBoost();
+        }
+    }
+
     void ProcessThrust() {
         if (Input.GetKey(KeyCode.Space) && thrustMode == ThrustMode.Continuous) {
             StartThrusting(thrustContinuous, ForceMode.Force);
@@ -108,6 +132,8 @@ public class MovementRocket : MonoBehaviour
             autoRotating = true;
             autoRotateTo = zRotation;
             movementMode = MovementMode.Translation;
+        } else if (Input.GetKeyDown(KeyCode.R)) {
+            transform.rotation = new Quaternion(transform.rotation.x, transform.rotation.y, 0f, transform.rotation.w);
         }
     }
 
@@ -120,24 +146,12 @@ public class MovementRocket : MonoBehaviour
         }
     }
 
-    private void ApplyTorqueFromPointsVectors(float rotationThisFrame, float modifier) {
-        rightPosition = transform.Find("Steering").Find("RightPoint").transform.position;
-        leftPosition = transform.Find("Steering").Find("LeftPoint").transform.position;
-        // transform.Find("Steering").Find("LeftPoint").transform.position = new Vector3(leftPosition.x, rightPosition.y, leftPosition.z);
-        transform.Find("Steering").Find("LeftPoint").transform.position = new Vector3(leftPosition.x, rightPosition.y, leftPosition.z);
-
-        Vector3 newVector = (rightPosition - leftPosition).normalized * modifier;
-        newVector.y = 0f;
-        rb.AddTorque(newVector * rotationThisFrame * Time.deltaTime, ForceMode.Impulse);
+    private void ApplyWorldRotation(float rotationThisFrame, Vector3 rotationVector) {
+        transform.Rotate(rotationVector * rotationThisFrame * Time.deltaTime, Space.World);
     }
 
-    private void ApplyTorque(float rotationThisFrame, Vector3 rotationVector) {
-        rightPosition = transform.Find("Steering").Find("RightPoint").transform.position;
-        leftPosition = transform.Find("Steering").Find("LeftPoint").transform.position;
-        // transform.Find("Steering").Find("LeftPoint").transform.position = new Vector3(leftPosition.x, rightPosition.y, leftPosition.z);
-        transform.Find("Steering").Find("LeftPoint").transform.position = new Vector3(leftPosition.x, rightPosition.y, leftPosition.z);
-
-        rb.AddTorque(rotationVector * rotationThisFrame * Time.deltaTime, ForceMode.Impulse);
+    private void ApplyRotation(float rotationThisFrame, Vector3 rotationVector) {
+        transform.Rotate(rotationVector * rotationThisFrame * Time.deltaTime);
     }
 
     private void AutoRotate(Quaternion rotateTo) {
@@ -160,23 +174,31 @@ public class MovementRocket : MonoBehaviour
 
     private void StartRotating() {
         if (Input.GetKey(KeyCode.A)) {
-            ApplyTorque(rotationSpeed, Vector3.down);
+            ApplyWorldRotation(rotationSpeed, Vector3.down);
             if (!rightBoosterParticles.isPlaying) {
                 rightBoosterParticles.Play();
             }
             
         }
         else if (Input.GetKey(KeyCode.D)) {
-            ApplyTorque(rotationSpeed, Vector3.up);
+            ApplyWorldRotation(rotationSpeed, Vector3.up);
             if (!leftBoosterParticles.isPlaying) {
                 leftBoosterParticles.Play();
             }
         }
         if (Input.GetKey(KeyCode.W)) {
-            ApplyTorqueFromPointsVectors(rotationSpeed, -1f);
+            if (!initialZMovementInitiated) {
+                cameraManagerScript.UpdateActiveCamera(CameraManager.CameraType.FollowNormalFOV);
+                initialZMovementInitiated = true;
+            }
+            ApplyRotation(rotationSpeed, Vector3.left);
         }
         else if (Input.GetKey(KeyCode.S)) {
-            ApplyTorqueFromPointsVectors(rotationSpeed, 1f);
+            if (!initialZMovementInitiated) {
+                cameraManagerScript.UpdateActiveCamera(CameraManager.CameraType.FollowNormalFOV);
+                initialZMovementInitiated = true;
+            }
+            ApplyRotation(rotationSpeed, Vector3.right);
         }
         
         if (Input.GetMouseButton(1)) {
@@ -185,11 +207,9 @@ public class MovementRocket : MonoBehaviour
             float xAxis = Input.GetAxis("Mouse X");
             float yAxis = Input.GetAxis("Mouse Y");
 
-            ApplyTorque(mouseSensitivity, new Vector3(0f, xAxis, 0f));
-            ApplyTorqueFromPointsVectors(mouseSensitivity, -yAxis);
-        } 
-        
-        if (Input.GetMouseButtonUp(1)) {
+            ApplyWorldRotation(mouseSensitivity, new Vector3(0f, xAxis, 0f));
+            ApplyRotation(mouseSensitivity, new Vector3(-yAxis, 0f, 0f));
+        } else if (Input.GetMouseButtonUp(1)) {
             Cursor.lockState = CursorLockMode.None;
         }
     }

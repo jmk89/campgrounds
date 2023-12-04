@@ -126,7 +126,6 @@ public class PlayerSelector : MonoBehaviour
         spawned.tag = "Player";
         spawned.SetActive(true);
         
-        
         CameraManager cameraManagerScript = GameObject.FindGameObjectWithTag("CameraManager").GetComponent<CameraManager>();
         cameraManagerScript.UpdateAllCameraTargets(spawned);
         cameraManagerScript.UpdateActiveCamera(CameraManager.CameraType.FramingTransposer);        

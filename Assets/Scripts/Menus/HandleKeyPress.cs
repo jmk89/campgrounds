@@ -9,17 +9,10 @@ public class HandleKeyPress : MonoBehaviour
     CheatCodes cheatCodesScript;
 
     void Start() {
-        SceneManager.sceneLoaded += OnSceneLoaded;
         cameraManagerScript = GameObject.FindGameObjectWithTag("CameraManager").GetComponent<CameraManager>();
         playerSelectorScript = GameObject.FindGameObjectWithTag("PlayerSelector").GetComponent<PlayerSelector>();
     }
 
-    void OnSceneLoaded(Scene arg0, LoadSceneMode arg1) {
-        cheatCodesScript = GameObject.FindGameObjectWithTag("Player").GetComponent<CheatCodes>();
-        cheatCodesScript.ToggleCollisions();
-    }
-
-    // Update is called once per frame
     void Update()
     {
         HandleCamera();
@@ -34,9 +27,11 @@ public class HandleKeyPress : MonoBehaviour
         }
 
         if (Input.GetMouseButtonDown(0)) {
-            cameraManagerScript.FreeCamActivate();
+            cameraManagerScript.UpdateActiveCamera(CameraManager.CameraType.FreeLook);
+            // cameraManagerScript.FreeCamActivate();
         } else if (Input.GetMouseButtonUp(0)) {
-            cameraManagerScript.FreeCamDeactivate();
+            cameraManagerScript.UpdateActiveCamera(CameraManager.CameraType.FollowNormalFOV);
+            // cameraManagerScript.FreeCamDeactivate();
         }
     }
 
@@ -49,6 +44,7 @@ public class HandleKeyPress : MonoBehaviour
     }
 
     void HandleCheatCodes() {
+        cheatCodesScript = GameObject.FindGameObjectWithTag("Player").GetComponent<CheatCodes>();
         if (Input.GetKeyDown(KeyCode.L)) {
             cheatCodesScript.LoadNextScene();
         }
