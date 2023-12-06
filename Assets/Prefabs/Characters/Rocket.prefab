@@ -1064,15 +1064,15 @@ MonoBehaviour:
   translationSpeed: 50
   autoRotateSpeed: 1
   mouseSensitivity: 300
-  thrustContinuous: 10000
-  boost: 30000
+  downBrakes: 2000
+  upDraft: 5000
+  upDraftSeconds: 1.5
+  initialUpDraft: 10000
+  thrustContinuous: 8000
+  boost: 24000
   boostSeconds: 3
   continuousDrag: 2
   continuousMass: 2
-  thrustPeriodic: 80
-  thrustPause: 0.75
-  periodicDrag: 5
-  periodicMass: 1
   mainBoosterParticles: {fileID: 7758582688395046070}
   leftBoosterParticles: {fileID: 6290658667642222749}
   rightBoosterParticles: {fileID: 613185378228027696}
@@ -1190,7 +1190,7 @@ MonoBehaviour:
   crash: {fileID: 8300000, guid: 08d62bcbd0eca2f43a29dd04bbeb39e5, type: 3}
   successParticles: {fileID: 5470347200574858304}
   crashParticles: {fileID: 3309140195216402446}
-  collisionsEnabled: 1
+  collisionsEnabled: 0
   collidedWith: 
 --- !u!65 &230258891080321078
 BoxCollider:

@@ -17,6 +17,7 @@ public class CameraManager : MonoBehaviour
     [SerializeField] List<MyCamera> myCameras;
     [Header ("Follow Cam Shake Settings")]
     [SerializeField] float maxShake = .33f;
+    [SerializeField] float shakeOffset = 0f;
     [Header ("Follow Cam FOV Settings")]
     [SerializeField] float FOVAtRest = 47f;
     [SerializeField] float FOVAdjustAfterSpeed = 50f;
@@ -29,6 +30,7 @@ public class CameraManager : MonoBehaviour
     private MyCamera activeCam;
     private GameObject player;
     private float playerVelocity;
+    bool applyCameraShake = false;
 
     void Update() {
         ProcessFollowCamFOV();
@@ -38,6 +40,10 @@ public class CameraManager : MonoBehaviour
     public void ProcessFollowCamShake() {
         CinemachineVirtualCamera followCamVirtualCamera = myCameras
             .Find(cam => cam.CameraType == CameraType.FollowNormalFOV).Camera.GetComponent<CinemachineVirtualCamera>();
+        if (!applyCameraShake) {
+            followCamVirtualCamera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_AmplitudeGain = 0f;
+            return;
+        } 
         float currentFOV = followCamVirtualCamera.m_Lens.FieldOfView;
         float fovRatio = (currentFOV - FOVAtRest) / (FOVMax - FOVAtRest);
         float shakeAmount = fovRatio * maxShake;
@@ -45,8 +51,21 @@ public class CameraManager : MonoBehaviour
         
     }
 
+    public void ApplyCameraShake(bool applyShake) {
+        applyCameraShake = applyShake;
+    }
+
     public void ProcessFollowCamFOV() {
-        playerVelocity = player.GetComponent<Rigidbody>().velocity.magnitude;
+        Rigidbody rb = player.GetComponent<Rigidbody>();
+        playerVelocity = rb.velocity.magnitude;
+
+        MyCamera followCam = myCameras.Find(cam => cam.CameraType == CameraType.FollowNormalFOV);
+        Vector3 camPos = followCam.Camera.transform.position;
+        Vector3 playerPosition = rb.position;
+        // Debug.Log("camPosition: " + camPos + " playerPosition: " + playerPosition);
+
+
+
         CinemachineVirtualCamera followCamVirtualCamera = myCameras
             .Find(cam => cam.CameraType == CameraType.FollowNormalFOV).Camera.GetComponent<CinemachineVirtualCamera>();
         float diff = playerVelocity - FOVAdjustAfterSpeed;

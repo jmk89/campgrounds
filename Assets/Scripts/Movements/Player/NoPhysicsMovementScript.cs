@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class NoPhysicsMovementScript : MonoBehaviour
 {
@@ -7,19 +8,20 @@ public class NoPhysicsMovementScript : MonoBehaviour
     [SerializeField] float translationSpeed = 50f;
     [SerializeField] float autoRotateSpeed = 1f;
     [SerializeField] float mouseSensitivity = 300f;
+    [Header ("Up and Down")]
+    [SerializeField] float downBrakes = 2000;
+    [SerializeField] float upDraft = 5000f;
+    [SerializeField] float upDraftSeconds = 1.5f;
+    [SerializeField] float initialUpDraft = 10000f;
+
 
     [Header ("Continuous Thrust")]
-    [SerializeField] float thrustContinuous = 10000f;
+    [SerializeField] float thrustContinuous = 8000f;
     [SerializeField] float boost = 30000f;
     [SerializeField] float boostSeconds = 3f;
     [SerializeField] float continuousDrag = 2f;
     [SerializeField] float continuousMass = 2f;
 
-    [Header ("Periodic Thrust")]
-    [SerializeField] float thrustPeriodic = 80f;
-    [SerializeField] float thrustPause = 0.75f;
-    [SerializeField] float periodicDrag = 5f;
-    [SerializeField] float periodicMass = 1f;
     
     [Header ("Particles & Sound")]
     [SerializeField] ParticleSystem mainBoosterParticles;
@@ -32,31 +34,69 @@ public class NoPhysicsMovementScript : MonoBehaviour
     Quaternion zRotation = new Quaternion(0.7f, 0f, 0f, 0.7f);
     Quaternion autoRotateTo = Quaternion.identity;
     MovementMode movementMode = MovementMode.Rotation;
-    ThrustMode thrustMode = ThrustMode.Continuous;
     bool initialZMovementInitiated = false;
+    bool initialUpdraftApplied = false;
+    bool initialUpdraftCompleted = false;
+    bool autoThrustToggled = false;
     bool autoRotating = false;
     float slerpTime = 0f;
-    float thrustTimeSinceLast = 0f;
+    float upDraftTime = 0f;
     float boostTime = 0f;
     bool processingBoost = false;
+    bool processingUpdraft = false;
     enum MovementMode {Rotation, Translation};
-    enum ThrustMode {Continuous, Periodic};
     CameraManager cameraManagerScript;
 
     void Start() {
         rb = GetComponent<Rigidbody>();
         audioSource = GetComponent<AudioSource>();
-        thrustTimeSinceLast = thrustPause;
         SetDragAndMass(continuousDrag, continuousMass);
         cameraManagerScript = GameObject.FindGameObjectWithTag("CameraManager").GetComponent<CameraManager>();
     }
 
     void Update() {
-        ProcessThrustMode();
         ProcessThrust();
         ProcessBoost();
         ProcessAutoRotation();
         ProcessMovements();
+        ProcessBrakes();
+        ProcessUpdraft();
+    }
+
+    void ProcessBrakes() {
+        if (Input.GetKey(KeyCode.LeftShift)) {
+            rb.AddForce(Vector3.down * downBrakes * Time.deltaTime, ForceMode.Force);
+        }
+    }
+
+    void ProcessUpdraft() {
+        float updraftForceToUse = initialUpdraftCompleted ? upDraft : initialUpDraft;
+        if (Input.GetKeyDown(KeyCode.E) && upDraftTime == 0) {
+            processingUpdraft = true;
+            if (!initialUpdraftApplied) {
+                initialUpdraftApplied = true;
+                updraftForceToUse = initialUpDraft;
+            } else {
+                updraftForceToUse = upDraft;
+            }            
+        }
+        
+        if (processingUpdraft) {
+            ApplyUpdraft(updraftForceToUse);
+        }
+    }
+
+    void ApplyUpdraft(float updraftForce) {
+        if (upDraftTime > upDraftSeconds) {
+            upDraftTime = 0;
+            processingUpdraft = false;
+            if (updraftForce == initialUpDraft) {
+                initialUpdraftCompleted = true;
+            }
+            return;
+        }
+        upDraftTime += Time.deltaTime;
+        rb.AddForce(Vector3.up * updraftForce * Time.deltaTime);
     }
 
     void ProcessMovements() {
@@ -64,18 +104,6 @@ public class NoPhysicsMovementScript : MonoBehaviour
             ProcessTranslation();
         } else {
             ProcessRotation();
-        }
-    }
-
-    void ProcessThrustMode() {
-        if (Input.GetKeyDown(KeyCode.E)) {
-            if (thrustMode == ThrustMode.Continuous) {
-                thrustMode = ThrustMode.Periodic;
-                SetDragAndMass(periodicDrag, periodicMass);
-            } else {
-                thrustMode = ThrustMode.Continuous;
-                SetDragAndMass(continuousDrag, continuousMass);
-            }
         }
     }
 
@@ -89,6 +117,7 @@ public class NoPhysicsMovementScript : MonoBehaviour
         if (boostTime > boostSeconds) {
             boostTime = 0f;
             processingBoost = false;
+            cameraManagerScript.ApplyCameraShake(false);
             return;
         }
         boostTime += Time.deltaTime;
@@ -96,8 +125,9 @@ public class NoPhysicsMovementScript : MonoBehaviour
     }
 
     void ProcessBoost() {
-        if (Input.GetKeyDown(KeyCode.F) && thrustMode == ThrustMode.Continuous && boostTime == 0) {
+        if (Input.GetKeyDown(KeyCode.F) && boostTime == 0) {
             processingBoost = true;
+            cameraManagerScript.ApplyCameraShake(true);
         }
 
         if (processingBoost) {
@@ -106,16 +136,16 @@ public class NoPhysicsMovementScript : MonoBehaviour
     }
 
     void ProcessThrust() {
-        if (Input.GetKey(KeyCode.Space) && thrustMode == ThrustMode.Continuous) {
+        if (Input.GetKeyDown(KeyCode.Alpha1)) {
+            Debug.Log("Toggling Autothrust from: " + autoThrustToggled + " to " + !autoThrustToggled);
+            autoThrustToggled = !autoThrustToggled;
+        }
+
+        if (autoThrustToggled || Input.GetKey(KeyCode.Space) || (Input.GetMouseButton(0) && Input.GetMouseButton(1))) {
             StartThrusting(thrustContinuous, ForceMode.Force);
-        } else if (Input.GetKey(KeyCode.Space) && thrustMode == ThrustMode.Periodic && thrustTimeSinceLast >= thrustPause) {
-            StartThrusting(thrustPeriodic, ForceMode.Impulse);
-            thrustTimeSinceLast = 0f;
         } else {
             StopThrusting();
         }
-
-        thrustTimeSinceLast += Time.deltaTime;
     }
 
     void SetDragAndMass(float drag, float mass) {
@@ -240,8 +270,8 @@ public class NoPhysicsMovementScript : MonoBehaviour
             mainBoosterParticles.Play();
         }
 
-        Vector3 forceToAdd = Vector3.up * thrustForce;
-        forceToAdd *= forceMode == ForceMode.Force ? Time.deltaTime : 1;
+        Vector3 forceToAdd = Vector3.up * thrustForce * Time.deltaTime;
         rb.AddRelativeForce(forceToAdd, forceMode);
+        
     }
 }

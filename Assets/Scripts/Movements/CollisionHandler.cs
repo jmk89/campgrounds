@@ -12,7 +12,7 @@ public class CollisionHandler : MonoBehaviour
     [SerializeField] ParticleSystem successParticles;
     [SerializeField] ParticleSystem crashParticles;
 
-    public bool collisionsEnabled = true;
+    public bool collisionsEnabled = false;
     public string collidedWith = "";
 
     AudioSource audioSource;

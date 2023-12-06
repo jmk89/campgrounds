@@ -36,11 +36,12 @@ public class HandleKeyPress : MonoBehaviour
     }
 
     void HandlePlayerSelector() {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            playerSelectorScript.SelectCharacter(0);
-        } else if (Input.GetKeyDown(KeyCode.Alpha2)){
-            playerSelectorScript.SelectCharacter(1);
-        }
+        //first open the menu, then allow select char
+        // if (Input.GetKeyDown(KeyCode.Alpha1)) {
+        //     playerSelectorScript.SelectCharacter(0);
+        // } else if (Input.GetKeyDown(KeyCode.Alpha2)){
+        //     playerSelectorScript.SelectCharacter(1);
+        // }
     }
 
     void HandleCheatCodes() {
