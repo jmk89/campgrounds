@@ -162,8 +162,6 @@ public class NoPhysicsMovementScript : MonoBehaviour
             autoRotating = true;
             autoRotateTo = zRotation;
             movementMode = MovementMode.Translation;
-        } else if (Input.GetKeyDown(KeyCode.R)) {
-            transform.rotation = new Quaternion(transform.rotation.x, transform.rotation.y, 0f, transform.rotation.w);
         }
     }
 
@@ -194,7 +192,6 @@ public class NoPhysicsMovementScript : MonoBehaviour
             transform.rotation = rotateTo;
             autoRotating = false;
             slerpTime = 0f;
-            rb.useGravity = movementMode == MovementMode.Translation ? false : true;
             return;
         } else {
             slerpTime += Time.deltaTime;
