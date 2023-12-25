@@ -1,36 +1,54 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 public class RayCheckGround : MonoBehaviour
 {
-    [SerializeField] float maxHeight = 10f;
-    [SerializeField] float forceHeight = 2f;
-    [SerializeField] float down = 25f;
+    [SerializeField] float maxDistance = 10f;
+    [SerializeField] float firstDistance = 1f;
+    [SerializeField] float firstDistanceDownForce = 150f;
+    [SerializeField] float secondDistance = 2f;
+    [SerializeField] float secondDistanceDownForce = 100;
     [SerializeField] Rigidbody rb;
-    [SerializeField] LayerMask castingMask;
 
-    bool autoThrustEnabled = false;
+    List<RaycastHit> maxDistanceRayCastHits;
+    List<RaycastHit> firstDistanceRayCastHits;
+    List<RaycastHit> secondDistanceRayCastHits;
+
 
     // Update is called once per frame
     void Update()
     {
-        CheckHeight();
+        CheckForTaggedHits();
+        ApplyForces();
     }
 
-    void CheckHeight() {
+    void CheckForTaggedHits() {
         Ray ray = new Ray(transform.position, Vector3.down);
-        RaycastHit ray_result;
-        bool underMaxHeight = Physics.Raycast(ray, out ray_result, maxHeight);
-        bool underForceHeight = Physics.Raycast(ray, out ray_result, forceHeight);
-        
-        if (!underMaxHeight) {
+        maxDistanceRayCastHits = Physics.SphereCastAll(ray, maxDistance, 0.01f)
+            .ToList().FindAll(hit => hit.collider?.gameObject?.tag == "DistanceCheckable");
+        firstDistanceRayCastHits = Physics.SphereCastAll(ray, firstDistance, 0.01f)
+            .ToList().FindAll(hit => hit.collider?.gameObject?.tag == "DistanceCheckable");
+        secondDistanceRayCastHits = Physics.SphereCastAll(ray, secondDistance, 0.01f)
+            .ToList().FindAll(hit => hit.collider?.gameObject?.tag == "DistanceCheckable");
+    }
+
+    void ApplyForces() {
+        if (firstDistanceRayCastHits.Count < 1) {
+            Debug.Log("Applying Down Force from SphereCast");
+            rb.AddForce(new Vector3(0f, -firstDistanceDownForce, 0f) * Time.deltaTime, ForceMode.Acceleration);
+        }
+        if (secondDistanceRayCastHits.Count < 1) {
+            Debug.Log("Applying Down Force from SphereCast");
+            rb.AddForce(new Vector3(0f, -secondDistanceDownForce, 0f) * Time.deltaTime, ForceMode.Acceleration);
+        }
+
+        if (maxDistanceRayCastHits.Count < 1) {
+            Debug.Log("Using Gravity");
             rb.useGravity = true;
         } else {
             rb.useGravity = false;
         }
-
-        if (!underForceHeight) {
-            rb.AddForce(new UnityEngine.Vector3(0f, -down, 0f) * Time.deltaTime, ForceMode.Acceleration);
-        }
     }
-    
+
 }

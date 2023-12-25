@@ -261,7 +261,7 @@ public class NoPhysicsMovementScript : MonoBehaviour
 
     private void StartThrusting(float thrustForce, ForceMode forceMode) {
         if (!audioSource.isPlaying) {
-            audioSource.PlayOneShot(mainFartEngine);
+            // audioSource.PlayOneShot(mainFartEngine);
         }
         if (!mainBoosterParticles.isPlaying) {
             mainBoosterParticles.Play();
