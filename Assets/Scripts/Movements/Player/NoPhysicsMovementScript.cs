@@ -38,6 +38,7 @@ public class NoPhysicsMovementScript : MonoBehaviour
     bool initialUpdraftApplied = false;
     bool initialUpdraftCompleted = false;
     bool autoThrustToggled = false;
+    bool thrustEnabled = true;
     bool autoRotating = false;
     float slerpTime = 0f;
     float upDraftTime = 0f;
@@ -57,7 +58,6 @@ public class NoPhysicsMovementScript : MonoBehaviour
     void Update() {
         ProcessThrust();
         ProcessBoost();
-        ProcessAutoRotation();
         ProcessMovements();
         ProcessBrakes();
         ProcessUpdraft();
@@ -121,7 +121,7 @@ public class NoPhysicsMovementScript : MonoBehaviour
             return;
         }
         boostTime += Time.deltaTime;
-        rb.AddRelativeForce(Vector3.up * boost * Time.deltaTime);
+        rb.AddRelativeForce(Vector3.forward * boost * Time.deltaTime);
     }
 
     void ProcessBoost() {
@@ -136,8 +136,12 @@ public class NoPhysicsMovementScript : MonoBehaviour
     }
 
     void ProcessThrust() {
+        if (!thrustEnabled) {
+            StopThrusting();
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            Debug.Log("Toggling Autothrust from: " + autoThrustToggled + " to " + !autoThrustToggled);
             autoThrustToggled = !autoThrustToggled;
         }
 
@@ -151,18 +155,6 @@ public class NoPhysicsMovementScript : MonoBehaviour
     void SetDragAndMass(float drag, float mass) {
         rb.drag = drag;
         rb.mass = mass;
-    }
-
-    void ProcessAutoRotation() {
-        if (Input.GetKeyDown(KeyCode.X)) {
-            autoRotating = true;
-            autoRotateTo = Quaternion.identity;
-            movementMode = MovementMode.Rotation;
-        } else if (Input.GetKeyDown(KeyCode.T)) {
-            autoRotating = true;
-            autoRotateTo = zRotation;
-            movementMode = MovementMode.Translation;
-        }
     }
 
     void ProcessRotation() {
@@ -200,6 +192,10 @@ public class NoPhysicsMovementScript : MonoBehaviour
     }
 
     private void StartRotating() {
+        if (autoRotating) {
+            return;
+        }
+
         if (Input.GetKey(KeyCode.A)) {
             ApplyWorldRotation(rotationSpeed, Vector3.down);
             if (!rightBoosterParticles.isPlaying) {
@@ -267,8 +263,16 @@ public class NoPhysicsMovementScript : MonoBehaviour
             mainBoosterParticles.Play();
         }
 
-        Vector3 forceToAdd = Vector3.up * thrustForce * Time.deltaTime;
+        Vector3 forceToAdd = Vector3.forward * thrustForce * Time.deltaTime;
         rb.AddRelativeForce(forceToAdd, forceMode);
-        
+    }
+
+    public void ThrustEnabled(bool enable) {
+        thrustEnabled = enable;
+    }
+
+    public void SetAutoRotateTo(Vector3 rotation) {
+        autoRotateTo = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
+        autoRotating = true;
     }
 }

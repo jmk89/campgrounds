@@ -72,8 +72,16 @@ public class CollisionHandler : MonoBehaviour
         
         switch (tag) {
             case "Coin":
-                UpdateCoins(other.gameObject.GetComponent<Coin>().GetValue());
-                other.gameObject.SetActive(false);
+                UpdateCoins(other.gameObject.GetComponentInParent<Coin>().GetValue());
+                other.gameObject.transform.parent.gameObject.SetActive(false);
+                break;
+            case "StickyPad":
+                Debug.Log("entered sticky pad trigger");
+                Vector3 lookAt = other.gameObject.transform.Find("TargetToLookAt").transform.position;
+                Debug.Log($"look at {lookAt}");
+                MoveCharacterToStickyPadTarget(
+                    other.gameObject.transform.Find("TargetDestination").transform.position, lookAt
+                );
                 break;
             case "CharacterUnlock":
                 // UnlockCharacter(other.gameObject.GetComponent);
@@ -95,6 +103,13 @@ public class CollisionHandler : MonoBehaviour
 
     void UpdateCoins(int updateAmount) {
         inventoryManager.GetComponent<InventoryTracker>().UpdateCoins(updateAmount);
+    }
+
+    void MoveCharacterToStickyPadTarget(Vector3 positionToMoveTo, Vector3 targetToLookAt) {
+        Debug.Log($"make character look at {targetToLookAt}");
+        AutoMoveScript autoMoveScript = GetComponent<AutoMoveScript>();
+        autoMoveScript.SetAutoMoveParameters(positionToMoveTo, targetToLookAt);
+        autoMoveScript.AutoMoveCharacter();
     }
 
     void RemoveGate(int gateNumber) {

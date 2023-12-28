@@ -35,16 +35,13 @@ public class RayCheckGround : MonoBehaviour
 
     void ApplyForces() {
         if (firstDistanceRayCastHits.Count < 1) {
-            Debug.Log("Applying Down Force from SphereCast");
             rb.AddForce(new Vector3(0f, -firstDistanceDownForce, 0f) * Time.deltaTime, ForceMode.Acceleration);
         }
         if (secondDistanceRayCastHits.Count < 1) {
-            Debug.Log("Applying Down Force from SphereCast");
             rb.AddForce(new Vector3(0f, -secondDistanceDownForce, 0f) * Time.deltaTime, ForceMode.Acceleration);
         }
 
         if (maxDistanceRayCastHits.Count < 1) {
-            Debug.Log("Using Gravity");
             rb.useGravity = true;
         } else {
             rb.useGravity = false;
