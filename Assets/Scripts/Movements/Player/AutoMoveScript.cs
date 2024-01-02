@@ -37,7 +37,7 @@ public class AutoMoveScript : MonoBehaviour
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime);
         LookAt();
 
-        if (Vector3.Distance(transform.position, targetPosition) < 0.001f) {
+        if (Vector3.Distance(transform.position, targetPosition) < 0.5f) {
             reachedTargetDestination = true;
             GetComponent<NoPhysicsMovementScript>().ThrustEnabled(true);
         }
