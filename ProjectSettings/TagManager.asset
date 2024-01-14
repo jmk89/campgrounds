@@ -21,6 +21,10 @@ TagManager:
   - FreeLookCam
   - CameraManager
   - DistanceCheckable
+  - VerticalPlate
+  - StickyPad
+  - Undefined
+  - QuestGiver
   layers:
   - Default
   - TransparentFX
@@ -30,7 +34,7 @@ TagManager:
   - UI
   - 
   - 
-  - 
+  - Post Processing Layer
   - 
   - 
   - 

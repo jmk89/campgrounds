@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b35c28d63e215fc4f8931d0210bbb2b6, type: 3}
+  m_Name: First Quest
+  m_EditorClassIdentifier: 
+  questName: First Quest
+  questDescription: This is the first quest in the game. Find the other raven
+  currencyReward: 10
+  spawnableMesh: {fileID: 7430675136665140341, guid: e2d84e06b581d6b438033eaaa0bb64f8, type: 3}
+  objectiveTasks:
+  - Go to the big tree and press (G) to interact
+  requiredQuests: []

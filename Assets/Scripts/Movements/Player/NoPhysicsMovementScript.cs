@@ -25,6 +25,7 @@ public class NoPhysicsMovementScript : MonoBehaviour
     
     [Header ("Particles & Sound")]
     [SerializeField] ParticleSystem mainBoosterParticles;
+    [SerializeField] ParticleSystem boostParticles;
     [SerializeField] ParticleSystem leftBoosterParticles;
     [SerializeField] ParticleSystem rightBoosterParticles;
     [SerializeField] AudioClip mainFartEngine;
@@ -96,7 +97,8 @@ public class NoPhysicsMovementScript : MonoBehaviour
             return;
         }
         upDraftTime += Time.deltaTime;
-        rb.AddForce(Vector3.up * updraftForce * Time.deltaTime);
+        rb.AddForce(Vector3.up * updraftForce, ForceMode.Impulse);
+        // rb.AddForce(Vector3.up * updraftForce * Time.deltaTime);
     }
 
     void ProcessMovements() {
@@ -118,6 +120,7 @@ public class NoPhysicsMovementScript : MonoBehaviour
             boostTime = 0f;
             processingBoost = false;
             cameraManagerScript.ApplyCameraShake(false);
+            boostParticles.Stop();
             return;
         }
         boostTime += Time.deltaTime;
@@ -128,6 +131,8 @@ public class NoPhysicsMovementScript : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F) && boostTime == 0) {
             processingBoost = true;
             cameraManagerScript.ApplyCameraShake(true);
+            boostParticles.Play();
+            mainBoosterParticles.Stop();
         }
 
         if (processingBoost) {
@@ -259,7 +264,7 @@ public class NoPhysicsMovementScript : MonoBehaviour
         if (!audioSource.isPlaying) {
             // audioSource.PlayOneShot(mainFartEngine);
         }
-        if (!mainBoosterParticles.isPlaying) {
+        if (!mainBoosterParticles.isPlaying && !processingBoost) {
             mainBoosterParticles.Play();
         }
 

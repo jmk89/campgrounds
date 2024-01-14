@@ -27,6 +27,11 @@ public class HandleUIKeypress : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.I)) {
             HandleHideUI();
         }
+        
+    }
+
+    void HandleInteractButton() {
+
     }
 
     void HandleBackpack() {
